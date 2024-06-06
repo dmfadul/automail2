@@ -104,6 +104,11 @@ def prepare_email_list(pdf_path, names):
         for pair in name_email_pairs:
             f.write(f"{pair[0].strip()}, {pair[1].strip()}\n")
 
+    with open("current_course.json", 'rw') as f:
+        course_dict = json.load(f)
+        course_dict["class_name"] = class_name
+        json.dump(course_dict, f)
+        
     return class_name
 
 
@@ -116,49 +121,41 @@ def get_course_name():
         print(f"Error accessing folder: {e}")
         return 1
     
-    names = []
     for file in files:
-        if file is None or file == "trmemail.pdf":
+        if file is None or file == "trmemail.pdf":      
             continue
-        names.append(get_course_from_pdf(os.path.join(folder_path, file)))
+
+        current_course, doc_name = get_info_from_pdf(os.path.join(folder_path, file))
+        break
 
     with open("courses.json", 'r') as f:
         course_names = json.load(f)
-
-    current_course = None
-    for name in names:
-        if name in course_names:
-            current_course = name
-            break
     
-    if current_course is None and names.count(names[0]) == len(names):
-        print(f"O CURSO {names[0]} NÃO ESTÁ CADASTRADO.\nCADASTRAR CURSO {names[0]}? S/n")
+    if not current_course in course_names:
+        print(f"O CURSO {current_course} NÃO ESTÁ CADASTRADO.\nCADASTRAR CURSO {current_course}? S/n")
         response = input(": ")
         if response.lower() == "s" or response == "":
-            course_names.append(names[0])
+            course_names.append(current_course)
             with open("courses.json", 'w') as f:
                 json.dump(course_names, f)
-            current_course = names[0]
         else:
             print("CURSO NÃO CADASTRADO")
             return 1
-    elif current_course is None:
-        print("NOMES INCONSISTENTES")
-        return 1
 
     with open("current_course.json", 'w') as f:
-        json.dump(current_course, f)
+        json.dump({"course": current_course, "doc_name": doc_name}, f)
 
-    return current_course
+    return current_course, doc_name
 
 
-def get_course_from_pdf(file_path):
+def get_info_from_pdf(file_path):
     try:
         document = fitz.open(file_path)
         
         for page_num in range(len(document)):
             page = document.load_page(page_num)  # Load page
             text = page.get_text("text")  # Extract text
+            print(text)
 
             start_point = text.find('"')
             end_point = text.find('"', start_point + 1)
@@ -166,7 +163,15 @@ def get_course_from_pdf(file_path):
             course_name = text[start_point + 1:end_point]
             course_name = ' '.join(course_name.split())
 
-            return course_name
+            check_if_certificado = text.find("no dia")
+            check_if_diploma = text.find("no período de")
+
+            if check_if_certificado != -1 or check_if_diploma != -1:
+                doc_name = "Certificado.pdf"
+            else:
+                doc_name = "Historico.pdf"
+            
+            return course_name, doc_name
 
         document.close()
         

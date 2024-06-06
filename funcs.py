@@ -2,6 +2,7 @@ import os
 import json
 import utils
 import unidecode
+import credentials
 from engine import Session
 
 # annexes_path = "/home/david/Files/automail/Annexes/"
@@ -20,14 +21,22 @@ def send_email(user, password, subject, text, recipient, paths_annexes):
     return 0
 
 
-def multi_send(doc_name, curso, subject_text, main_text, login, passwd, c_name=None):   
-    email_pdf_path = f"Annexes/trmemail/{doc_name}"
-    # create folders with clean names for the files, and return the folder's names
+def multi_send(subject_text, main_text, restart=False):
+    login = credentials.login
+    passwd = credentials.passwd
     names = utils.prepare_annexes("Annexes", doc_name)
-    if c_name is None:
+
+    if not restart:
+        curso, doc_name = utils.get_course_name()   
+        email_pdf_path = f"Annexes/trmemail/{doc_name}"
         class_name = utils.prepare_email_list(pdf_path=email_pdf_path, names=names)
+
     else:
-        class_name = c_name
+        with open("current_course.json", 'r') as f:
+            curso = json.load(f)["course"]
+            doc_name = json.load(f)["doc_name"]
+            class_name = json.load(f)["class_name"]
+    
         print(f"restarting {class_name}")
 
     with open(f"emails/{class_name}.txt", 'r') as f:
@@ -38,7 +47,7 @@ def multi_send(doc_name, curso, subject_text, main_text, login, passwd, c_name=N
         name, email = [item.strip() for item in line.split(',')]
         names_emails.append((name, email))
 
-    if c_name is not None:
+    if restart:
         with open(f"logs/{class_name}.log", 'r') as f:
             lines = f.readlines()
             test_names = []
