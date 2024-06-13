@@ -21,22 +21,34 @@ def send_email(user, password, subject, text, recipient, paths_annexes):
     return 0
 
 
-def multi_send(subject_text, main_text, restart=False):
+def multi_send(subject_text, main_text):
+    try:
+        _multi_send(subject_text=subject_text, main_text=main_text, restart=False)
+    except Exception as e:
+        print(f"Error preparing email: {e}")
+        # _multi_send(subject_text=subject_text, main_text=main_text, restart=True)
+        # Descobrir o erro e substituir. Deve ser 'NonInteractibleElement' ou algo assim.
+
+
+def _multi_send(subject_text, main_text, restart=False):
     login = credentials.login
     passwd = credentials.passwd
-    names = utils.prepare_annexes("Annexes", doc_name)
 
     if not restart:
-        curso, doc_name = utils.get_course_name()   
+        curso, doc_name = utils.get_course_name()
+        if curso == 1:
+            return 1
         email_pdf_path = f"Annexes/trmemail/{doc_name}"
+        names = utils.prepare_annexes("Annexes", doc_name)
         class_name = utils.prepare_email_list(pdf_path=email_pdf_path, names=names)
 
     else:
         with open("current_course.json", 'r') as f:
-            curso = json.load(f)["course"]
-            doc_name = json.load(f)["doc_name"]
-            class_name = json.load(f)["class_name"]
-    
+            current_course_dict = json.load(f)
+            curso = current_course_dict["course"]
+            doc_name = current_course_dict["doc_name"]
+            class_name = current_course_dict["class_name"]
+   
         print(f"restarting {class_name}")
 
     with open(f"emails/{class_name}.txt", 'r') as f:
@@ -80,7 +92,7 @@ def multi_send(subject_text, main_text, restart=False):
         path = os.path.join(script_dir, "Annexes", folder_name, doc_name)
 
         annex = [path]
-
+       
         session.prepare_email(subject=f"{subject_text}{curso}", text=main_text, recipient=email_address)
 
         if session.attach_annexes(paths_annexes=annex) or email_address == "*":

@@ -104,8 +104,10 @@ def prepare_email_list(pdf_path, names):
         for pair in name_email_pairs:
             f.write(f"{pair[0].strip()}, {pair[1].strip()}\n")
 
-    with open("current_course.json", 'rw') as f:
+    with open("current_course.json", 'r') as f:
         course_dict = json.load(f)
+
+    with open("current_course.json", 'w') as f:
         course_dict["class_name"] = class_name
         json.dump(course_dict, f)
         
@@ -140,7 +142,7 @@ def get_course_name():
                 json.dump(course_names, f, indent=4)
         else:
             print("CURSO NÃO CADASTRADO")
-            return 1
+            return 1, 1
 
     with open("current_course.json", 'w') as f:
         json.dump({"course": current_course, "doc_name": doc_name}, f, indent=4)
