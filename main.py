@@ -3,12 +3,7 @@ import funcs
 subject_text = "Certidão de Conclusão de Curso - "
 main_text = ''
 
-# funcs.multi_send(
-#                 subject_text=subject_text,
-#                 main_text=main_text,
-#                 )
-
-
-import utils
-
-utils.get_course_name()
+funcs.multi_send(
+                subject_text=subject_text,
+                main_text=main_text,
+                )

@@ -132,18 +132,18 @@ def get_course_name():
         course_names = json.load(f)
     
     if not current_course in course_names:
-        print(f"O CURSO {current_course} NÃO ESTÁ CADASTRADO.\nCADASTRAR CURSO {current_course}? S/n")
-        response = input(": ")
+        print(f"O CURSO {current_course} NÃO ESTÁ CADASTRADO.\nCADASTRAR CURSO {current_course}? S/n", end=" ")
+        response = input(" ")
         if response.lower() == "s" or response == "":
             course_names.append(current_course)
             with open("courses.json", 'w') as f:
-                json.dump(course_names, f)
+                json.dump(course_names, f, indent=4)
         else:
             print("CURSO NÃO CADASTRADO")
             return 1
 
     with open("current_course.json", 'w') as f:
-        json.dump({"course": current_course, "doc_name": doc_name}, f)
+        json.dump({"course": current_course, "doc_name": doc_name}, f, indent=4)
 
     return current_course, doc_name
 
