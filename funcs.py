@@ -4,6 +4,7 @@ import utils
 import unidecode
 import credentials
 from engine import Session
+from selenium.common.exceptions import ElementNotInteractableException
 
 # annexes_path = "/home/david/Files/automail/Annexes/"
 
@@ -83,40 +84,30 @@ def _multi_send(subject_text, main_text, restart=False):
     session.login_mail(login, passwd)
 
     num_fails = 0
-    for item in names_emails:
-        print(item)
-        email_address = item[1]
-        folder_name = unidecode.unidecode(item[0])
-
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        path = os.path.join(script_dir, "Annexes", folder_name, doc_name)
-
-        annex = [path]
-       
+    for name, email_address in names_emails:
+        print(f"{name} - {email_address}")
+      
         session.prepare_email(subject=f"{subject_text}{curso}", text=main_text, recipient=email_address)
+        flag = session.attach_annexes_by_folder(name, doc_name)
 
-        if session.attach_annexes(paths_annexes=annex) or email_address == "*":
+        if flag or email_address == "*":
             num_fails += 1
-            if email_address == "*":
-                print(f"NOT SENT: {item[0]} - Has no email address")
-                result = f"{item[0]}: FAILED - NO EMAIL\n"
-            else:
-                print(f"NOT SENT: {item[0]} - Has no annex")
-                result = f"{item[0]}: FAILED - NO ANNEX\n"
 
+            if flag:
+                print(f"NOT SENT: {name} - Has no annex")
+                result = f"{name}: FAILED - NO ANNEX\n"
+            else:
+                print(f"NOT SENT: {name} - Has no email address")
+                result = f"{name}: FAILED - NO EMAIL\n"
+            
             with open(f"logs/{class_name}.log", 'a') as f:
                 f.write(f"{result}")
 
             session.reset()
             continue
-
-        if session.send():
-            result = f"{item[0]}: success\n"
-        else:
-            result = f"{item[0]}: FAILED\n"
-
-        with open(f"logs/{class_name}.log", 'a') as f:
-            f.write(f"{result}")
+        
+        flag = session.send()
+        utils.log(flag, name, class_name)
 
     print(f"NUMBER OF FAILURES: {num_fails}")
     # session.end_session()

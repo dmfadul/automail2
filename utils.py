@@ -179,3 +179,14 @@ def get_info_from_pdf(file_path):
         
     except Exception as e:
         print(f"Error reading PDF file: {e}")
+
+
+def log(flag, name, class_name):
+    if flag:
+        result = f"{name}: success\n"
+    else:
+        result = f"{name}: FAILED\n"
+
+    with open(f"logs/{class_name}.log", 'a') as f:
+        f.write(f"{result}")
+        

@@ -1,4 +1,6 @@
+import os
 import time
+import unidecode
 import selenium
 import selenium.webdriver.support.ui
 import selenium.webdriver.chrome.options
@@ -73,11 +75,21 @@ class Session:
         self.driver.find_element(By.ID, "subject_1").send_keys(subject)
         self.actions.send_keys(Keys.TAB).send_keys(text).perform()
 
+    def attach_annexes_by_folder(self, folder_name, doc_name, send_only_if_all=True):
+        folder_name = unidecode.unidecode(folder_name)
+        
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        path = os.path.join(script_dir, "Annexes", folder_name, doc_name)
+
+        annex = [path]
+
+        flag = self.attach_annexes(paths_annexes=annex, send_only_if_all=send_only_if_all)
+
+        return flag
+
     def attach_annexes(self, paths_annexes=None, send_only_if_all=True):
         link_annex = "//tr[10]/td[2]/a"
-
-        paths_to_annex = [] if paths_annexes is None else paths_annexes
-        paths_to_annex = [p for p in paths_to_annex if p is not None] if len(paths_to_annex) > 0 else paths_to_annex
+        paths_to_annex = [] if not paths_annexes else [p for p in paths_annexes if p is not None]
 
         for i, path in enumerate(paths_to_annex):
             self.driver.find_element(By.XPATH, link_annex).click()
