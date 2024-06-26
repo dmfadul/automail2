@@ -22,30 +22,20 @@ def send_email(user, password, subject, text, recipient, paths_annexes):
     return 0
 
 
-def multi_send(subject_text, main_text):
-    try:
-        _multi_send(subject_text=subject_text, main_text=main_text, restart=False)
-    except Exception as e:
-        print(f"Error preparing email: {e}")
-        # _multi_send(subject_text=subject_text, main_text=main_text, restart=True)
-        # Descobrir o erro e substituir. Deve ser 'NonInteractibleElement' ou algo assim.
-
-
-def _multi_send(subject_text, main_text, restart=False):
-    login = credentials.login
-    passwd = credentials.passwd
+def multi_send(subject_text, main_text, restart=False):
 
     if not restart:
         curso, doc_name = utils.get_course_name()
         if curso == 1:
             return 1
-        email_pdf_path = f"Annexes/trmemail/{doc_name}"
-        names = utils.prepare_annexes("Annexes", doc_name)
-        class_name = utils.prepare_email_list(pdf_path=email_pdf_path, names=names)
+        
+        class_name = utils.prepare_email_list(addresses_path=f"Annexes/trmemail/{doc_name}",
+                                              names=utils.prepare_annexes("Annexes", doc_name))
 
-    else:
+    elif restart:
         with open("current_course.json", 'r') as f:
             current_course_dict = json.load(f)
+
             curso = current_course_dict["course"]
             doc_name = current_course_dict["doc_name"]
             class_name = current_course_dict["class_name"]
@@ -81,7 +71,7 @@ def _multi_send(subject_text, main_text, restart=False):
                 break
 
     session = Session()
-    session.login_mail(login, passwd)
+    session.login_mail(credentials.login, credentials.passwd)
 
     num_fails = 0
     for name, email_address in names_emails:
@@ -92,17 +82,7 @@ def _multi_send(subject_text, main_text, restart=False):
 
         if flag or email_address == "*":
             num_fails += 1
-
-            if flag:
-                print(f"NOT SENT: {name} - Has no annex")
-                result = f"{name}: FAILED - NO ANNEX\n"
-            else:
-                print(f"NOT SENT: {name} - Has no email address")
-                result = f"{name}: FAILED - NO EMAIL\n"
-            
-            with open(f"logs/{class_name}.log", 'a') as f:
-                f.write(f"{result}")
-
+            utils.log_error(flag, name, class_name)
             session.reset()
             continue
         

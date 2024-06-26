@@ -33,11 +33,11 @@ def prepare_annexes(path, new_name):
     return folders
 
 
-def prepare_email_list(pdf_path, names):
+def prepare_email_list(addresses_path, names):
     corp_email_regex = r'\b[A-Za-z._%+-][A-Za-z0-9._%+-]*@pc\.pr\.gov\.br\b'
     human_email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
-    with open(pdf_path, 'rb') as file:
+    with open(addresses_path, 'rb') as file:
         reader = PyPDF2.PdfReader(file)
         num_pages = len(reader.pages)
         text = ""
@@ -189,4 +189,15 @@ def log(flag, name, class_name):
 
     with open(f"logs/{class_name}.log", 'a') as f:
         f.write(f"{result}")
-        
+
+
+def log_error(flag, name, class_name):
+    if flag:
+        print(f"NOT SENT: {name} - Has no annex")
+        result = f"{name}: FAILED - NO ANNEX\n"
+    else:
+        print(f"NOT SENT: {name} - Has no email address")
+        result = f"{name}: FAILED - NO EMAIL\n"
+    
+    with open(f"logs/{class_name}.log", 'a') as f:
+        f.write(f"{result}")
