@@ -31,6 +31,7 @@ def multi_send(subject_text, main_text, restart=False):
         
         class_name = utils.prepare_email_list(addresses_path=f"Annexes/trmemail/{doc_name}",
                                               names=utils.prepare_annexes("Annexes", doc_name))
+        names_emails = utils.get_class_email_addresses(class_name)
 
     elif restart:
         with open("current_course.json", 'r') as f:
@@ -42,15 +43,8 @@ def multi_send(subject_text, main_text, restart=False):
    
         print(f"restarting {class_name}")
 
-    with open(f"emails/{class_name}.txt", 'r') as f:
-        lines = f.readlines()
+        names_emails = utils.get_class_email_addresses(class_name)
 
-    names_emails = []
-    for line in lines:
-        name, email = [item.strip() for item in line.split(',')]
-        names_emails.append((name, email))
-
-    if restart:
         with open(f"logs/{class_name}.log", 'r') as f:
             lines = f.readlines()
             test_names = []

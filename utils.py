@@ -201,3 +201,15 @@ def log_error(flag, name, class_name):
     
     with open(f"logs/{class_name}.log", 'a') as f:
         f.write(f"{result}")
+
+
+def get_class_email_addresses(class_name):
+    with open(f"emails/{class_name}.txt", 'r') as f:
+        lines = f.readlines()
+
+    names_emails = []
+    for line in lines:
+        name, email = [item.strip() for item in line.split(',')]
+        names_emails.append((name, email))
+
+    return names_emails
