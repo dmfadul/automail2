@@ -6,63 +6,24 @@ import credentials
 from engine import Session
 from selenium.common.exceptions import ElementNotInteractableException
 
-# annexes_path = "/home/david/Files/automail/Annexes/"
-
-
-def send_email(user, password, subject, text, recipient, paths_annexes):
-    session = Session()
-    session.login_mail(user, password)
-    session.prepare_email(subject, text, recipient, conf_reading=True)
-
-    if session.attach_annexes(paths_annexes):
-        session.reset()
-        return 1
-
-    session.send()
-    return 0
-
 
 def multi_send(subject_text, main_text, restart=False):
 
     if not restart:
         curso, doc_name = utils.get_course_name()
-        if curso == 1:
-            return 1
+        if curso == 1: return 1
         
-        class_name = utils.prepare_email_list(addresses_path=f"Annexes/trmemail/{doc_name}",
-                                              names=utils.prepare_annexes("Annexes", doc_name))
+        path = f"Annexes/trmemail/{doc_name}"
+        names = utils.prepare_annexes("Annexes", doc_name)
+
+        class_name = utils.prep_email_list(addr_path=path, names=names)
         names_emails = utils.get_class_email_addresses(class_name)
 
     elif restart:
-        with open("current_course.json", 'r') as f:
-            current_course_dict = json.load(f)
-
-            curso = current_course_dict["course"]
-            doc_name = current_course_dict["doc_name"]
-            class_name = current_course_dict["class_name"]
-   
+        curso, doc_name, class_name = utils.get_restart_info()  
+        all_names_emails = utils.get_class_email_addresses(class_name)
+        names_emails = utils.get_restarted_names_emails(class_name, all_names_emails)
         print(f"restarting {class_name}")
-
-        names_emails = utils.get_class_email_addresses(class_name)
-
-        with open(f"logs/{class_name}.log", 'r') as f:
-            lines = f.readlines()
-            test_names = []
-            for line in lines:
-                test_name = line.split(':')[0].strip()
-                test_status = line.split(':')[1].strip()
-                if test_status == "FAILED":
-                    test_names.append(test_name)
-            last_name = lines[-1].split(":")[0].strip()
-
-        names_emails_copy = names_emails.copy()
-        names_emails = []
-        for i, name_email in enumerate(names_emails_copy):
-            if name_email[0] in test_names:
-                names_emails.append(name_email)
-            if name_email[0] == last_name:
-                names_emails.extend(names_emails_copy[i+1:])
-                break
 
     session = Session()
     session.login_mail(credentials.login, credentials.passwd)
@@ -75,8 +36,8 @@ def multi_send(subject_text, main_text, restart=False):
         flag = session.attach_annexes_by_folder(name, doc_name)
 
         if flag or email_address == "*":
-            num_fails += 1
             utils.log_error(flag, name, class_name)
+            num_fails += 1
             session.reset()
             continue
         

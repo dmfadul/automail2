@@ -33,11 +33,11 @@ def prepare_annexes(path, new_name):
     return folders
 
 
-def prepare_email_list(addresses_path, names):
+def prep_email_list(addr_path, names):
     corp_email_regex = r'\b[A-Za-z._%+-][A-Za-z0-9._%+-]*@pc\.pr\.gov\.br\b'
     human_email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
-    with open(addresses_path, 'rb') as file:
+    with open(addr_path, 'rb') as file:
         reader = PyPDF2.PdfReader(file)
         num_pages = len(reader.pages)
         text = ""
@@ -213,3 +213,31 @@ def get_class_email_addresses(class_name):
         names_emails.append((name, email))
 
     return names_emails
+
+
+def get_restart_info():
+    with open("current_course.json", 'r') as f:
+        current_course_dict = json.load(f)
+
+        curso = current_course_dict["course"]
+        doc_name = current_course_dict["doc_name"]
+        class_name = current_course_dict["class_name"]
+    
+    return curso, doc_name, class_name
+
+
+def get_restarted_names_emails(class_name, names_emails):
+    with open(f"logs/{class_name}.log", 'r') as f:
+        lines = f.readlines()
+        faild_names = [l.split(':')[0].strip() for l in lines if l.split(':')[1].strip() == "FAILED"]
+        final_name = lines[-1].split(":")[0].strip()
+
+        names_emails_cp = names_emails.copy()
+        names_emails = faild_names + [n_m for n_m in names_emails_cp if n_m[0] in faild_names]
+
+        for i, name_email in enumerate(names_emails_cp):
+            if name_email[0] == final_name:
+                names_emails.extend(names_emails_cp[i+1:])
+                break
+
+        return names_emails
