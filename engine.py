@@ -54,15 +54,15 @@ class Session:
         self.wait.until(EC.url_matches("https://sesp.pr.gov.br/expressoMail1_2/index.php"))
 
     def prepare_email(self, subject, text, recipient, conf_reading=False):
-        try:
-            WebDriverWait(self.driver, 0.5).until(EC.presence_of_element_located((By.CLASS_NAME, "ui-dialog")))
-            print("pop-up located")
+        # try:
+        #     WebDriverWait(self.driver, 0.5).until(EC.presence_of_element_located((By.CLASS_NAME, "ui-dialog")))
+        #     print("pop-up located")
 
-            ok_button = self.driver.find_element(By.XPATH, "//button[span[text()='Ok']]")
-            ok_button.click()
+        #     ok_button = self.driver.find_element(By.XPATH, "//button[span[text()='Ok']]")
+        #     ok_button.click()
 
-        except TimeoutException:
-            print("no pop-up found")
+        # except TimeoutException:
+        #     print("no pop-up found")
 
         btn_new = "//tr[2]/td[@class='content-menu-td']/div[@class='em_div_sidebox_menu']/" \
                   "span[@class='em_sidebox_menu']"
