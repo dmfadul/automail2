@@ -127,6 +127,11 @@ def get_course_name():
         if file is None or file == "trmemail.pdf":      
             continue
 
+        flag = get_info_from_pdf(os.path.join(folder_path, file))
+
+        if flag is None:
+            continue
+
         current_course, doc_name = get_info_from_pdf(os.path.join(folder_path, file))
         break
 
