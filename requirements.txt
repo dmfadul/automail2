@@ -1,7 +1,5 @@
 aiofiles==23.1.0
 anyio==3.6.2
-apt-clone==0.2.1
-apturl==0.5.2
 asgi-csrf==0.9
 asgiref==3.6.0
 asttokens==2.0.5
@@ -11,21 +9,17 @@ backcall==0.2.0
 backports.zoneinfo==0.2.1
 beautifulsoup4==4.8.2
 blinker==1.4
-Brlapi==0.7.0
 cachetools==5.3.1
 certifi==2019.11.28
 chardet==3.0.4
 click==8.1.3
 click-default-group-wheel==1.2.2
 colorama==0.4.3
-command-not-found==0.3
 configobj==5.0.6
 cryptography==2.8
-cupshelpers==1.0
 datasette==0.64.1
 dbus-python==1.2.16
 decorator==4.4.2
-defer==1.0.6
 distro==1.4.0
 Django==4.2.3
 entrypoints==0.3
@@ -54,7 +48,6 @@ keyring==18.0.1
 launchpadlib==1.10.13
 lazr.restfulclient==0.14.2
 lazr.uri==1.0.3
-louis==3.12.0
 macaroonbakery==1.3.1
 Mako==1.1.0
 MarkupSafe==2.1.2
@@ -63,7 +56,6 @@ mergedeep==1.3.4
 meson==1.2.1
 moviepy==1.0.3
 msgpack==0.6.2
-nemo-emblems==5.2.0
 netaddr==0.7.19
 netifaces==0.10.4
 numpy==1.23.1

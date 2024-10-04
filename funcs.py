@@ -38,7 +38,7 @@ def multi_send(subject_text, main_text, restart=False):
             if flag or email_address == "*":
                 utils.log_error(flag, name, class_name)
                 num_fails += 1
-                session.reset() # what does reset do? try deleting it.
+                # session.reset() # what does reset do? try deleting it.
                 continue
             
             try:

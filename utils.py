@@ -162,10 +162,12 @@ def get_info_from_pdf(file_path):
         for page_num in range(len(document)):
             page = document.load_page(page_num)  # Load page
             text = page.get_text("text")  # Extract text
-            print(text)
 
             start_point = text.find('"')
             end_point = text.find('"', start_point + 1)
+            if start_point == -1:
+                start_point = text.find('participou da ') + len('participou da ') - 1
+                end_point = text.find(', no dia', start_point + 1) 
 
             course_name = text[start_point + 1:end_point]
             course_name = ' '.join(course_name.split())
