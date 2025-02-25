@@ -115,7 +115,7 @@ def prep_email_list(addr_path, names):
 
 
 def get_course_name():
-    script_dir = os.path.dirname(os.path.abspath(__file__))    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     folder_path = os.path.join(script_dir, "Annexes")
     try:
         files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
