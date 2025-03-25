@@ -79,8 +79,12 @@ def prep_email_list(addr_path, names):
         name = name_idx[i][0]
         start, finish = name_idx[i][1], name_idx[i+1][1]
         fragment = text[start:finish]
+        
         corp_email, human_email = None, None
         for email in email_list:
+            if len(email) < 10:
+                continue
+            
             if email in fragment:
                 email_fragment = email
                 corp_email = re.findall(corp_email_regex, email_fragment)
@@ -99,7 +103,7 @@ def prep_email_list(addr_path, names):
 
     class_name = class_name.replace("/", "_")
     print(class_name)
-
+    
     with open(f"emails/{class_name}.txt", 'w') as f:
         for pair in name_email_pairs:
             f.write(f"{pair[0].strip()}, {pair[1].strip()}\n")
@@ -172,10 +176,10 @@ def get_info_from_pdf(file_path):
             course_name = text[start_point + 1:end_point]
             course_name = ' '.join(course_name.split())
 
-            check_if_certificado = text.find("no dia")
-            check_if_diploma = text.find("no período de")
+            check_if_certificado = (text.find("no ") != -1) and (text.find("dia") != -1)
+            check_if_diploma = (text.find("no ") != -1) and (text.find("período ") != -1) and (text.find("de ") != -1)
 
-            if check_if_certificado != -1 or check_if_diploma != -1:
+            if check_if_certificado or check_if_diploma:
                 doc_name = "Certificado.pdf"
             else:
                 doc_name = "Historico.pdf"
