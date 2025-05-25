@@ -29,7 +29,13 @@ def multi_send(subject_text, main_text, restart=False):
         session.login_mail(credentials.login, credentials.passwd)
 
         num_fails = 0
-        for name, email_address in names_emails:
+        for name_email in names_emails:
+            try:
+                name, email_address = name_email
+            except:
+                print("ERRO: ", name_email)
+                continue
+
             print(f"{name} - {email_address}")
 
             session.prepare_email(subject=f"{subject_text}{curso}", text=main_text, recipient=email_address)
